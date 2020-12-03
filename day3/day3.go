@@ -1,11 +1,13 @@
 package day3
 
 import (
-	"errors"
 	"fmt"
+
+	"github.com/jblashki/aoc-filereader-go"
 )
 
 const name = "Day 3"
+const input_file = "./day3/map"
 
 func RunDay(verbose bool) {
 	var aResult int
@@ -31,10 +33,44 @@ func RunDay(verbose bool) {
 	}
 }
 
+func countTrees(slopeMap []string, right int, down int) (count int) {
+	for xpos, ypos := 0, 0; ypos < len(slopeMap); xpos, ypos = xpos+right, ypos+down {
+		if xpos >= len(slopeMap[ypos]) {
+			xpos = xpos - len(slopeMap[ypos])
+		}
+
+		if slopeMap[ypos][xpos] == '#' {
+			count++
+		}
+	}
+
+	return
+}
+
 func a() (int, error) {
-	return 0, errors.New("Not Complete Yet")
+	slopeMap, err := filereader.ReadLines(input_file)
+	if err != nil {
+		return 0, err
+	}
+
+	count := countTrees(slopeMap, 3, 1)
+
+	return count, nil
 }
 
 func b() (int, error) {
-	return 0, errors.New("Not Complete Yet")
+	slopeMap, err := filereader.ReadLines(input_file)
+	if err != nil {
+		return 0, err
+	}
+
+	countRun1 := countTrees(slopeMap, 1, 1)
+	countRun2 := countTrees(slopeMap, 3, 1)
+	countRun3 := countTrees(slopeMap, 5, 1)
+	countRun4 := countTrees(slopeMap, 7, 1)
+	countRun5 := countTrees(slopeMap, 1, 2)
+
+	totalCount := countRun1 * countRun2 * countRun3 * countRun4 * countRun5
+
+	return totalCount, nil
 }
