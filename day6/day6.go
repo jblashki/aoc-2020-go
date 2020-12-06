@@ -1,12 +1,16 @@
 package day6
 
 import (
-	"errors"
 	"fmt"
+
+	filereader "github.com/jblashki/aoc-filereader-go"
 )
 
 const name = "Day 6"
 
+const inputFile = "./day6/answers"
+
+// RunDay runs Advent of Code Day 6 Puzzle
 func RunDay(verbose bool) {
 	var aResult int
 	var bResult int
@@ -32,9 +36,70 @@ func RunDay(verbose bool) {
 }
 
 func a() (int, error) {
-	return 0, errors.New("Not Complete Yet")
+	lines, err := filereader.ReadLines(inputFile)
+	if err != nil {
+		return 0, err
+	}
+
+	answerCount := make(map[rune]int)
+	line := ""
+	totalCount := 0
+	for _, line = range lines {
+		if line == "" {
+			for _, count := range answerCount {
+				if count > 0 {
+					totalCount++
+				}
+			}
+			answerCount = make(map[rune]int)
+		}
+
+		for j := 0; j < len(line); j++ {
+			answerCount[rune(line[j])]++
+		}
+	}
+
+	for _, count := range answerCount {
+		if count > 0 {
+			totalCount++
+		}
+	}
+
+	return totalCount, nil
 }
 
 func b() (int, error) {
-	return 0, errors.New("Not Complete Yet")
+	lines, err := filereader.ReadLines(inputFile)
+	if err != nil {
+		return 0, err
+	}
+
+	answerCount := make(map[rune]int)
+	line := ""
+	totalCount := 0
+	groupSize := 0
+	for _, line = range lines {
+		if line == "" {
+			for _, count := range answerCount {
+				if count == groupSize {
+					totalCount++
+				}
+			}
+			answerCount = make(map[rune]int)
+			groupSize = 0
+		} else {
+			groupSize++
+		}
+		for j := 0; j < len(line); j++ {
+			answerCount[rune(line[j])]++
+		}
+	}
+
+	for _, count := range answerCount {
+		if count == groupSize {
+			totalCount++
+		}
+	}
+
+	return totalCount, nil
 }
