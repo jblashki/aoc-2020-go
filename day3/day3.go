@@ -3,12 +3,13 @@ package day3
 import (
 	"fmt"
 
-	"github.com/jblashki/aoc-filereader-go"
+	filereader "github.com/jblashki/aoc-filereader-go"
 )
 
 const name = "Day 3"
-const input_file = "./day3/map"
+const inputFile = "./day3/map"
 
+// RunDay runs Advent of Code Day 3 Puzzle
 func RunDay(verbose bool) {
 	var aResult int
 	var bResult int
@@ -48,7 +49,7 @@ func countTrees(slopeMap []string, right int, down int) (count int) {
 }
 
 func a() (int, error) {
-	slopeMap, err := filereader.ReadLines(input_file)
+	slopeMap, err := filereader.ReadLines(inputFile)
 	if err != nil {
 		return 0, err
 	}
@@ -59,7 +60,7 @@ func a() (int, error) {
 }
 
 func b() (int, error) {
-	slopeMap, err := filereader.ReadLines(input_file)
+	slopeMap, err := filereader.ReadLines(inputFile)
 	if err != nil {
 		return 0, err
 	}
