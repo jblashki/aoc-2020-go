@@ -1,7 +1,6 @@
 package day11
 
 import (
-	"errors"
 	"fmt"
 
 	filereader "github.com/jblashki/aoc-filereader-go"
@@ -10,6 +9,7 @@ import (
 const name = "Day 11"
 const inputFile = "./day11/seats"
 
+// RunDay runs Advent of Code Day 11 Puzzle
 func RunDay(verbose bool) {
 	var aResult int
 	var bResult int
@@ -34,69 +34,100 @@ func RunDay(verbose bool) {
 	}
 }
 
-func checkSeat(seats [][]rune, i int, j int) bool {
-	if i < 0 {
-		return false
-	}
+type direction int
 
-	if i >= len(seats) {
-		return false
-	}
+const (
+	N direction = iota
+	NE
+	E
+	SE
+	S
+	SW
+	W
+	NW
+)
 
-	if j < 0 {
-		return false
+func canSeeOccupiedSeat(seats [][]rune, i int, j int, d direction, maxRadius int, curRadius int) bool {
+	switch d {
+	case N:
+		if i <= 0 {
+			return false
+		}
+		i--
+	case NE:
+		if i <= 0 || j >= len(seats[i])-1 {
+			return false
+		}
+		i--
+		j++
+	case E:
+		if j >= len(seats[i])-1 {
+			return false
+		}
+		j++
+	case SE:
+		if i >= len(seats)-1 || j >= len(seats[i])-1 {
+			return false
+		}
+		i++
+		j++
+	case S:
+		if i >= len(seats)-1 {
+			return false
+		}
+		i++
+	case SW:
+		if i >= len(seats)-1 || j <= 0 {
+			return false
+		}
+		i++
+		j--
+	case W:
+		if j <= 0 {
+			return false
+		}
+		j--
+	case NW:
+		if i <= 0 || j <= 0 {
+			return false
+		}
+		i--
+		j--
 	}
+	curRadius++
 
-	if j >= len(seats[i]) {
-		return false
-	}
-
-	if seats[i][j] == '#' {
+	if seats[i][j] == '.' {
+		if maxRadius != -1 && curRadius == maxRadius {
+			return false
+		} else {
+			return canSeeOccupiedSeat(seats, i, j, d, maxRadius, curRadius)
+		}
+	} else if seats[i][j] == '#' {
 		return true
 	}
 
 	return false
 }
 
-func countOccupiedSeats(seats [][]rune, i int, j int) int {
+func countSurroundingOccupiedSeats(seats [][]rune, i int, j int, partA bool) int {
 	count := 0
 
-	if checkSeat(seats, i-1, j-1) {
-		count++
-	}
-
-	if checkSeat(seats, i-1, j) {
-		count++
-	}
-
-	if checkSeat(seats, i-1, j+1) {
-		count++
-	}
-
-	if checkSeat(seats, i, j-1) {
-		count++
-	}
-
-	if checkSeat(seats, i, j+1) {
-		count++
-	}
-
-	if checkSeat(seats, i+1, j-1) {
-		count++
-	}
-
-	if checkSeat(seats, i+1, j) {
-		count++
-	}
-
-	if checkSeat(seats, i+1, j+1) {
-		count++
+	for d := N; d <= NW; d++ {
+		if partA {
+			if canSeeOccupiedSeat(seats, i, j, d, 1, 0) {
+				count++
+			}
+		} else {
+			if canSeeOccupiedSeat(seats, i, j, d, -1, 0) {
+				count++
+			}
+		}
 	}
 
 	return count
 }
 
-func processSeats(seats [][]rune) ([][]rune, bool) {
+func processSeats(seats [][]rune, partA bool) ([][]rune, bool) {
 	newSeats := make([][]rune, len(seats))
 
 	changed := false
@@ -105,7 +136,7 @@ func processSeats(seats [][]rune) ([][]rune, bool) {
 		for j := range seats[i] {
 			if seats[i][j] == 'L' {
 				// Check surrounding seats
-				count := countOccupiedSeats(seats, i, j)
+				count := countSurroundingOccupiedSeats(seats, i, j, partA)
 				if count == 0 {
 					newSeats[i][j] = '#'
 					changed = true
@@ -114,8 +145,12 @@ func processSeats(seats [][]rune) ([][]rune, bool) {
 				}
 			} else if seats[i][j] == '#' {
 				// Check surrounding seats
-				count := countOccupiedSeats(seats, i, j)
-				if count >= 4 {
+				count := countSurroundingOccupiedSeats(seats, i, j, partA)
+				surroundingSeatCount := 4
+				if !partA {
+					surroundingSeatCount = 5
+				}
+				if count >= surroundingSeatCount {
 					newSeats[i][j] = 'L'
 					changed = true
 				} else {
@@ -132,6 +167,7 @@ func processSeats(seats [][]rune) ([][]rune, bool) {
 
 func totalOccupied(seats [][]rune) int {
 	count := 0
+
 	for i := range seats {
 		for j := range seats[i] {
 			if seats[i][j] == '#' {
@@ -139,6 +175,7 @@ func totalOccupied(seats [][]rune) int {
 			}
 		}
 	}
+
 	return count
 }
 
@@ -150,23 +187,30 @@ func a() (int, error) {
 		seats[i] = []rune(line)
 	}
 
-	//fmt.Printf("%v\n", seats)
 	changed := true
 	for changed == true {
-		seats, changed = processSeats(seats)
+		seats, changed = processSeats(seats, true)
 	}
 
 	total := totalOccupied(seats)
 
-	// for i := range seats {
-	// 	for j := range seats[i] {
-	// 		fmt.Printf("%c ", seats[i][j])
-	// 	}
-	// 	fmt.Printf("\n")
-	// }
 	return total, nil
 }
 
 func b() (int, error) {
-	return 0, errors.New("Not Complete Yet")
+	lines, _ := filereader.ReadLines(inputFile)
+
+	seats := make([][]rune, len(lines))
+	for i, line := range lines {
+		seats[i] = []rune(line)
+	}
+
+	changed := true
+	for changed == true {
+		seats, changed = processSeats(seats, false)
+	}
+
+	total := totalOccupied(seats)
+
+	return total, nil
 }
