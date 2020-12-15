@@ -1,7 +1,6 @@
 package day15
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -32,9 +31,75 @@ func RunDay(verbose bool) {
 }
 
 func a() (int, error) {
-	return 0, errors.New("Not Complete Yet")
+	numbers := make([]int, 0)
+	numbers = append(numbers, 1)
+	numbers = append(numbers, 0)
+	numbers = append(numbers, 15)
+	numbers = append(numbers, 2)
+	numbers = append(numbers, 10)
+	numbers = append(numbers, 13)
+
+	spoken := make(map[int]int, 0)
+
+	turn := 0
+	lastNum := -1
+	num := -1
+	for {
+		if turn < len(numbers) {
+			num = numbers[turn]
+			spoken[num] = turn + 1
+		} else {
+			lastTurn, ok := spoken[lastNum]
+			if !ok {
+				num = 0
+			} else {
+				num = turn - lastTurn
+			}
+			spoken[lastNum] = turn
+		}
+		turn++
+
+		lastNum = num
+
+		if turn == 2020 {
+			return num, nil
+		}
+	}
 }
 
 func b() (int, error) {
-	return 0, errors.New("Not Complete Yet")
+	numbers := make([]int, 0)
+	numbers = append(numbers, 1)
+	numbers = append(numbers, 0)
+	numbers = append(numbers, 15)
+	numbers = append(numbers, 2)
+	numbers = append(numbers, 10)
+	numbers = append(numbers, 13)
+
+	spoken := make(map[int]int, 0)
+
+	turn := 0
+	lastNum := -1
+	num := -1
+	for {
+		if turn < len(numbers) {
+			num = numbers[turn]
+			spoken[num] = turn + 1
+		} else {
+			lastTurn, ok := spoken[lastNum]
+			if !ok {
+				num = 0
+			} else {
+				num = turn - lastTurn
+			}
+			spoken[lastNum] = turn
+		}
+		turn++
+
+		lastNum = num
+
+		if turn == 30000000 {
+			return num, nil
+		}
+	}
 }
